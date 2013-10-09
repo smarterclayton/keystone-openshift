@@ -1,0 +1,20 @@
+#!/bin/bash
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
+HTTPD_CFG_FILE=$OPENSHIFT_PYTHON_DIR/etc/conf/httpd_nolog.conf
+HTTPD_PASSENV_FILE=$OPENSHIFT_PYTHON_DIR/etc/conf.d/passenv.conf
+HTTPD_PID_FILE=$OPENSHIFT_PYTHON_DIR/run/httpd.pid
+
+echo "Stopping existing Apache"
+ensure_valid_httpd_process "$HTTPD_PID_FILE" "$HTTPD_CFG_FILE"
+if [ -f "$HTTPD_PID_FILE" ]; then
+    httpd_pid=`cat "$HTTPD_PID_FILE" 2> /dev/null`
+    /usr/sbin/httpd -C "Include $OPENSHIFT_PYTHON_DIR/etc/conf.d/*.conf" -f $HTTPD_CFG_FILE -k stop
+    wait_for_stop $httpd_pid
+fi
+
+sleep 0.5
+
+echo "Starting our own Apache"
+write_httpd_passenv $HTTPD_PASSENV_FILE
+/usr/sbin/httpd -C "Include $HTTPD_PASSENV_FILE" -C "Include $OPENSHIFT_REPO_DIR/.openshift/wsgi.conf" -f $HTTPD_CFG_FILE -k start

@@ -1,0 +1,6 @@
+#!/bin/sh
+ln -s $OPENSHIFT_REPO_DIR/.openshift/keystone_wsgi.py $OPENSHIFT_REPO_DIR/wsgi/main
+ln -s $OPENSHIFT_REPO_DIR/.openshift/keystone_wsgi.py $OPENSHIFT_REPO_DIR/wsgi/admin
+ln -s $OPENSHIFT_REPO_DIR/keystone $OPENSHIFT_REPO_DIR/libs
+erb $OPENSHIFT_REPO_DIR/.openshift/keystone.conf.erb > $OPENSHIFT_REPO_DIR/.openshift/keystone.conf
+erb $OPENSHIFT_REPO_DIR/.openshift/wsgi.conf.erb > $OPENSHIFT_REPO_DIR/.openshift/wsgi.conf
